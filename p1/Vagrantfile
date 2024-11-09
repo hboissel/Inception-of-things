@@ -1,0 +1,24 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+  config.vm.box = "generic/debian12"
+
+  config.vm.provider :virtualbox do |v|
+    v.cpus = 1
+    v.memory = 512
+  end
+
+  # Server
+  config.vm.define "ebouvierS" do |s|
+    s.vm.hostname = "ebouvierS"
+    s.vm.network "private_network", ip: "192.168.56.110"
+  end
+
+
+  # ServerWorker
+  config.vm.define "ebouvierSW" do |sw|
+    sw.vm.hostname = "ebouvierSW"
+    sw.vm.network "private_network", ip: "192.168.56.111"
+  end
+end
