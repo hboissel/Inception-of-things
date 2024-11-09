@@ -1,24 +1,47 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
+SERVER_NAME = "ebouvierS"
+SERVER_IP = "192.168.56.110"
+
+SERVER_WORKER_NAME = "ebouvierSW"
+SERVER_WORKER_IP = "192.168.56.111"
+
+$scriptS = <<-SCRIPT
+curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="server" sh -s - --write-kubeconfig-mode=644 --node-ip #{SERVER_IP} --node-name #{SERVER_NAME} --flannel-iface eth1 --token #{ENV['MASTER_TOKEN']}
+sudo chmod 644 /etc/rancher/k3s/k3s.yaml
+SCRIPT
+
+$scriptSW = <<-SCRIPT
+curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="agent --server https://#{SERVER_IP}:6443 --node-name #{SERVER_WORKER_NAME} --node-ip #{SERVER_WORKER_IP} --flannel-iface eth1 --token #{ENV['MASTER_TOKEN']}" sh -s -
+SCRIPT
+
 Vagrant.configure("2") do |config|
   config.vm.box = "generic/debian12"
 
-  config.vm.provider :virtualbox do |v|
-    v.cpus = 1
-    v.memory = 512
-  end
-
   # Server
-  config.vm.define "ebouvierS" do |s|
-    s.vm.hostname = "ebouvierS"
-    s.vm.network "private_network", ip: "192.168.56.110"
-  end
+  config.vm.define SERVER_NAME do |s|
+    s.vm.provider :virtualbox do |v|
+      v.cpus = 1
+      v.memory = 1024
+      v.name = SERVER_NAME
+    end
+    s.vm.hostname = SERVER_NAME
+    s.vm.network "private_network", ip: SERVER_IP
 
+    s.vm.provision "shell", inline: $scriptS
+  end
 
   # ServerWorker
-  config.vm.define "ebouvierSW" do |sw|
-    sw.vm.hostname = "ebouvierSW"
-    sw.vm.network "private_network", ip: "192.168.56.111"
+  config.vm.define SERVER_WORKER_NAME do |sw|
+    sw.vm.provider :virtualbox do |v|
+      v.cpus = 1
+      v.memory = 1024
+      v.name = SERVER_WORKER_NAME
+    end
+    sw.vm.hostname = SERVER_WORKER_NAME
+    sw.vm.network "private_network", ip: SERVER_WORKER_IP
+
+    sw.vm.provision "shell", inline: $scriptSW
   end
 end
