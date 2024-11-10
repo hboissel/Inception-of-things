@@ -1,48 +1,44 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-SERVER_NAME = "ebouvierS"
+SERVER_NAME = "hboisselS"
+WORKER_NAME = "hboisselSW"
 SERVER_IP = "192.168.56.110"
-
-SERVER_WORKER_NAME = "ebouvierSW"
-SERVER_WORKER_IP = "192.168.56.111"
+WORKER_IP = "192.168.56.111"
 
 if (ARGV.include?("up") || ARGV.include?("reload") || ARGV.include?("provision")) && (ENV['TOKEN'].nil? || ENV['TOKEN'].empty?)
   raise "TOKEN environment var missing."
 end
 
 Vagrant.configure("2") do |config|
-  config.vm.box = "generic-x64/alpine319"
+  config.vm.box = "debian/bookworm64"
+  config.vm.box_version = "12.20240905.1"
 
-  # Server
-  config.vm.define SERVER_NAME do |s|
-    s.vm.provider :virtualbox do |v|
-      v.cpus = 2
-      v.memory = 2048
-      v.name = SERVER_NAME
-    end
-    s.vm.hostname = SERVER_NAME
-    s.vm.network "private_network", ip: SERVER_IP
+  config.vm.box_check_update = false
 
-    s.vm.provision "shell" do |sh|
-      sh.path = "scripts/server.sh"
-      sh.args = [SERVER_IP.to_s, ENV['TOKEN'].to_s]
+  config.vm.provider "virtualbox" do |vb|
+    vb.cpus = 1
+    vb.memory = "1024"
+  end
+
+  config.vm.define SERVER_NAME do |machine|
+    machine.vm.hostname = SERVER_NAME
+    machine.vm.network "private_network", ip: SERVER_IP
+    machine.vm.provision "shell", path: "scripts/config_server.sh", env: {TOKEN: ENV["TOKEN"], SERVER_IP: SERVER_IP}
+
+    machine.vm.provider "virtualbox" do |vb|
+      vb.name = SERVER_NAME
     end
   end
 
-  # ServerWorker
-  config.vm.define SERVER_WORKER_NAME do |sw|
-    sw.vm.provider :virtualbox do |v|
-      v.cpus = 2
-      v.memory = 2048
-      v.name = SERVER_WORKER_NAME
-    end
-    sw.vm.hostname = SERVER_WORKER_NAME
-    sw.vm.network "private_network", ip: SERVER_WORKER_IP
+  config.vm.define WORKER_NAME do |machine|
+    machine.vm.hostname = WORKER_NAME
+    machine.vm.network "private_network", ip: WORKER_IP
+    machine.vm.provision "shell", path: "scripts/config_worker.sh", env: {TOKEN: TOKEN,SERVER_IP: SERVER_IP, WORKER_IP: WORKER_IP}
 
-    sw.vm.provision "shell" do |sh|
-      sh.path = "scripts/worker.sh"
-      sh.args = [SERVER_IP.to_s, SERVER_WORKER_NAME.to_s, SERVER_WORKER_IP.to_s, ENV['TOKEN'].to_s]
+    machine.vm.provider "virtualbox" do |vb|
+      vb.name = WORKER_NAME
     end
   end
+
 end
