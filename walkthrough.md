@@ -72,7 +72,7 @@ chosen latest LTS image as the subject ask: *debian12*
 
 bootstrap the k3s cluster
 ```bash
-MASTER_TOKEN=mytoken vagrant up
+TOKEN=mytoken vagrant up
 ```
 
 check the k3s cluster
