@@ -86,3 +86,66 @@ ebouviersw   Ready    <none>                 7m8s   v1.30.6+k3s1   192.168.56.11
 ```
 
 
+## part 2
+
+deploy the pod
+```bash
+cd /opt
+kubectl apply -f app-deployment.yml
+```
+first interogation ? how to access the app ? spoiler: ingress.
+```bash
+ebouvierS:/opt$ kubectl get pods -o wide
+NAME                       READY   STATUS    RESTARTS   AGE     IP           NODE        NOMINATED NODE   READINESS GATES
+app-one-777b8769b7-hqtbp   1/1     Running   0          5m50s   10.42.0.15   ebouviers   <none>           <none>
+```
+10.42.0.15 = clusted ip. = cannot access the app from outside
+
+[k8s terminology](https://kubernetes.io/docs/concepts/services-networking/ingress/#terminology)
+
+### issues i encountered:
+default resolve to 192.168.56.110
+it seems that the ingress controller traefik doesnt work with `defaultBackend`
+### kubectl helpers:
+
+show pods
+```bash
+kubectl show pods
+```
+show all pods (even kube-system)
+```bash
+kubectl show pods -A
+```
+show all ingress
+```bash
+kubectl describe ingress -A
+```
+show one ingress
+```bash
+kubectl describe ingress <name> -n <namespace> #kubectl describe ingress apps -n apps
+```
+delete from manifest file:
+```bash
+kubectl delete -f <manifestfile.yml>
+```
+delete ingress with name
+```bash
+kubectl delete ingress <name>
+```
+
+show every ressources
+```bash
+kubectl get all
+```
+delete service
+```bash
+kubectl delete service <name>
+```
+delete all namespace
+```bash
+kubectl delete all --all -n <name>
+```
+show namespaces
+```bash
+kubectl get namespaces --show-labels
+```
