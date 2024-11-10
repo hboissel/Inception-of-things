@@ -1,0 +1,23 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+SERVER_NAME = "ebouvierS"
+SERVER_IP = "192.168.56.110"
+
+Vagrant.configure("2") do |config|
+  config.vm.box = "generic-x64/alpine319"
+
+  config.vm.provider :virtualbox do |v|
+    v.cpus = 4
+    v.memory = 2048
+    v.name = SERVER_NAME
+  end
+
+  config.vm.hostname = SERVER_NAME
+  config.vm.network "private_network", ip: SERVER_IP
+
+  config.vm.provision "shell" do |sh|
+    sh.path = "scripts/server.sh"
+    sh.args = [SERVER_IP.to_s, SERVER_NAME.to_s]
+  end
+end
