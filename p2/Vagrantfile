@@ -13,11 +13,12 @@ Vagrant.configure("2") do |config|
     v.name = SERVER_NAME
   end
 
+  config.vm.synced_folder "confs/", "/opt"
   config.vm.hostname = SERVER_NAME
   config.vm.network "private_network", ip: SERVER_IP
 
   config.vm.provision "shell" do |sh|
     sh.path = "scripts/server.sh"
-    sh.args = [SERVER_IP.to_s, SERVER_NAME.to_s]
+    sh.args = [SERVER_IP.to_s]
   end
 end

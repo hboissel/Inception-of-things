@@ -2,10 +2,9 @@
 
 curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="server" sh -s - \
 --write-kubeconfig-mode=644 \
---node-ip ${1} \
---node-name ${2} \
 --flannel-iface eth1 \
---token ${3}
+--bind-address ${1} \
+--token ${2}
 
 if service k3s status | grep -q "started"; then
     echo "K3s server started successfully."
