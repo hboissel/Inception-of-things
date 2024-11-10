@@ -4,32 +4,32 @@ metadata:
   name: apps-ingress
 spec:
   rules:
-  - host: app1.com
-    http:
-      paths:
-      - pathType: Prefix
-        path: "/"
-        backend:
-          service:
-            name: app-one-svc
-            port:
-              name: app-one-port
-  - host: app2.com
-    http:
-      paths:
-      - pathType: Prefix
-        path: "/"
-        backend:
-          service:
-            name: app-two-svc
-            port:
-              name: app-two-port
-  - http:
-      paths:
-      - pathType: Prefix
-        path: "/"
-        backend:
-          service:
-            name: app-three-svc
-            port:
-              name: app-three-port
+    - host: app1.com
+      http:
+        paths:
+          - pathType: Prefix
+            path: "/"
+            backend:
+              service:
+                name: app-one
+                port:
+                  name: app-one-port
+    - host: app2.com
+      http:
+        paths:
+          - pathType: Prefix
+            path: "/"
+            backend:
+              service:
+                name: app-two
+                port:
+                  name: app-two-port
+    - http:
+        paths:
+          - pathType: Prefix
+            path: "/"
+            backend:
+              service:
+                name: app-three
+                port:
+                  name: app-three-port

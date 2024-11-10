@@ -34,11 +34,10 @@ Vagrant.configure("2") do |config|
   config.vm.define WORKER_NAME do |machine|
     machine.vm.hostname = WORKER_NAME
     machine.vm.network "private_network", ip: WORKER_IP
-    machine.vm.provision "shell", path: "scripts/config_worker.sh", env: {TOKEN: TOKEN,SERVER_IP: SERVER_IP, WORKER_IP: WORKER_IP}
+    machine.vm.provision "shell", path: "scripts/config_worker.sh", env: {TOKEN: ENV["TOKEN"],SERVER_IP: SERVER_IP, WORKER_IP: WORKER_IP}
 
     machine.vm.provider "virtualbox" do |vb|
       vb.name = WORKER_NAME
     end
   end
-
 end
