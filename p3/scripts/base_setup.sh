@@ -1,8 +1,13 @@
 #!/bin/bash
 
+echo "===== Executing part 1: k3d setup ====="
+
 sudo apt update -y
 sudo apt upgrade -y
 
+if ! grep -q "127.0.0.1 argocd.localhost" /etc/hosts; then
+    echo -e "127.0.0.1 argocd.localhost\n127.0.0.1 api.localhost\n127.0.0.1 traefik.localhost" | sudo tee -a /etc/hosts
+fi
 
 # install docker
 sudo apt-get update
@@ -21,9 +26,14 @@ sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin 
 
 #setup current user in docker group (remove the need of sudo)
 sudo usermod -aG docker $USER
-
+# need to reboot here.
 docker run hello-world
 
+#setup kubectl
+curl -LO https://dl.k8s.io/release/$(curl -Ls https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl
+chmod +x ./kubectl
+sudo mv ./kubectl /usr/local/bin/kubectl
+kubectl version --client
 
 #setup k3d
 curl -s https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | bash
