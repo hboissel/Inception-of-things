@@ -1,0 +1,21 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: app-argocd
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/hboissel/argocd-app-hboissel.git
+    targetRevision: HEAD
+    path: .
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: dev
+  syncPolicy:
+    automated:
+      selfHeal: true
+      prune: true
+      allowEmpty: false
+    syncOptions:
+    - ApplyOutOfSyncOnly=true
