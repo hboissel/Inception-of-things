@@ -10,8 +10,8 @@ echo "===== Executing part 2: Deploy argocd and api ====="
 kubectl create namespace argocd --dry-run=client -o yaml | kubectl apply -f -
 kubectl apply -k $PWD/confs/argocd/kustom
 kubectl wait -n argocd --for=condition=available deployment/argocd-server --timeout=300s
-kubectl apply -n argocd -f $PWD/confs/argocd/ingress.yaml
-kubectl apply -n argocd -f $PWD/confs/argocd/application.yml
+kubectl apply -n argocd -f $PWD/confs/argocd
+
 #show argocd passwd
 kubectl get secret -n argocd argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 --decode; echo
 
