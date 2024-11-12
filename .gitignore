@@ -1,3 +1,4 @@
 .vagrant/
 *.crt
 *.key
+.vscode/
