@@ -1,22 +1,34 @@
 #!/bin/bash
 
+
+export SERVER_IP=192.168.56.110
+cd /vagrant
+
+k3d cluster delete -a
+
 echo "===== Executing part 1: Cluster creation ====="
 
-k3d cluster create iot --api-port 6550 -p "80:80@loadbalancer" -p "443:443@loadbalancer" || true
+k3d cluster create argocd-app-cluster --api-port 6550 -p "80:80@loadbalancer" -p "443:443@loadbalancer"
 
 echo "===== Executing part 2: Deploy argocd and api ====="
 
+kubectl create namespace argocd
+kubectl create namespace dev
+
 # argocd
-kubectl create namespace argocd --dry-run=client -o yaml | kubectl apply -f -
-kubectl apply -k $PWD/confs/argocd/kustom
+kubectl apply -n argocd -k confs/argocd/kustom
+echo "Waiting for ArgoCD to be ready..."
 kubectl wait -n argocd --for=condition=available deployment/argocd-server --timeout=300s
-kubectl apply -n argocd -f $PWD/confs/argocd
+echo "Creating Ingress and Application for ArgoCD"
+kubectl apply -n argocd -f confs/argocd
 
-#show argocd passwd
-kubectl get secret -n argocd argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 --decode; echo
+export ARGODC_PASSWORD=$(
+    kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
+    echo
+)
 
-# dev api
-kubectl create namespace dev --dry-run=client -o yaml | kubectl apply -f -
-kubectl apply -f $PWD/confs/api
+# print credentials
+echo "ArgoCD admin password: $ARGODC_PASSWORD"
+unset ARGODC_PASSWORD
 
 kubectl get all -A
