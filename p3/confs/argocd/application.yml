@@ -1,12 +1,12 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: app-argocd
+  name: api
   namespace: argocd
 spec:
   project: default
   source:
-    repoURL: https://github.com/hboissel/argocd-app-hboissel.git
+    repoURL: https://github.com/zneel/argocdtest
     targetRevision: HEAD
     path: .
   destination:
@@ -14,8 +14,8 @@ spec:
     namespace: dev
   syncPolicy:
     automated:
-      selfHeal: true
       prune: true
+      selfHeal: true
       allowEmpty: false
     syncOptions:
-    - ApplyOutOfSyncOnly=true
+      - ApplyOutOfSyncOnly=true

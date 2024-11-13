@@ -110,11 +110,11 @@ it seems that the ingress controller traefik doesnt work with `defaultBackend`
 
 show pods
 ```bash
-kubectl show pods
+kubectl get pods # maybe show instead of get
 ```
 show all pods (even kube-system)
 ```bash
-kubectl show pods -A
+kubectl get pods -A # maybe show instead of get
 ```
 show all ingress
 ```bash
@@ -137,6 +137,10 @@ show every ressources
 ```bash
 kubectl get all
 ```
+show every ressources (wide)
+```bash
+kubectl get all -A
+```
 delete service
 ```bash
 kubectl delete service <name>
@@ -148,4 +152,17 @@ kubectl delete all --all -n <name>
 show namespaces
 ```bash
 kubectl get namespaces --show-labels
+```
+check traefik logs
+```bash
+kubectl logs -n kube-system service/traefik
+```
+
+path for argocd login:
+```
+argocd.localhost
+```
+path for traefik dashboard:
+```
+traefik.localhost/dashboard/
 ```
