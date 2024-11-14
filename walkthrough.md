@@ -157,6 +157,10 @@ check traefik logs
 ```bash
 kubectl logs -n kube-system service/traefik
 ```
+delete all clusters
+```bash
+k3d cluster delete -a
+```
 
 path for argocd login:
 ```

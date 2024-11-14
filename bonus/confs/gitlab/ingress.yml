@@ -1,0 +1,116 @@
+# apiVersion: traefik.containo.us/v1alpha1
+# kind: IngressRoute
+# metadata:
+#   name: gitlab-server
+#   namespace: gitlab
+# spec:
+#   entryPoints:
+#     - websecure
+#   routes:
+#     - kind: Rule
+#       match: Host(`gitlab.local`)
+#       priority: 10
+#       services:
+#         - name: gitlab-server
+#           port: 80
+#   tls:
+#     certResolver: default
+# ---
+# apiVersion: traefik.containo.us/v1alpha1
+# kind: IngressRoute
+# metadata:
+#   name: gitlab-server-redirect-to-https
+#   namespace: gitlab
+# spec:
+#   entryPoints:
+#     - web
+#   routes:
+#     - kind: Rule
+#       match: Host(`gitlab.local`)
+#       priority: 10
+#       services:
+#         - name: gitlab-server
+#           port: 80
+#       middlewares:
+#         - name: redirect-https
+#           namespace: gitlab
+# ---
+# apiVersion: traefik.containo.us/v1alpha1
+# kind: Middleware
+# metadata:
+#   name: redirect-https
+#   namespace: argocd
+# spec:
+#   redirectScheme:
+#     scheme: https
+#     permanent: true
+#     port: "443"
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: gitlab-https-redirect
+  namespace: gitlab
+spec:
+  redirectScheme:
+    scheme: https
+    permanent: true
+# ---
+# apiVersion: traefik.containo.us/v1alpha1
+# kind: Middleware
+# metadata:
+#   name: gitlab-gitlab-security
+#   namespace: gitlab
+# spec:
+#   headers:
+#     frameDeny: true
+#     sslRedirect: true
+#     browserXssFilter: true
+#     contentTypeNosniff: true
+#     stsIncludeSubdomains: true
+#     stsPreload: true
+#     stsSeconds: 31536000
+---
+apiVersion: traefik.io/v1alpha1
+kind: ServersTransport
+metadata:
+  name: gitlab-transport
+  namespace: gitlab
+spec:
+  serverName: gitlab
+  insecureSkipVerify: true
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: gitlab-websecure
+  namespace: gitlab
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - kind: Rule
+      match: Host(`gitlab.local`)
+      services:
+        - name: gitlab-webservice-default
+          port: 8181
+          serversTransport: gitlab-transport
+  tls:
+    certResolver: default
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: gitlab-web
+  namespace: gitlab
+spec:
+  entryPoints:
+    - web
+  routes:
+    - kind: Rule
+      match: Host(`gitlab.local`)
+      services:
+        - name: gitlab-webservice-default
+          port: 8181
+      middlewares:
+        - name: gitlab-https-redirect
