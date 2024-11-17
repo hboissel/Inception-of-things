@@ -28,5 +28,5 @@ To start an temporary ui, use the argocd cli: `argocd admin dashboard -n argocd`
 TODO:
 - [x] Gitlab deployment
 - [x] Make cloning functionnal (https/ssh) -> export GIT_SSL_NO_VERIFY=1
-- [ ] Create repo automatically + push deployment.yml
-- [ ] Change argocd url
+- [x] Create repo automatically + push deployment.yml
+- [x] Change argocd url

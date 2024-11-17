@@ -5,9 +5,9 @@ cd /vagrant
 TOOLBOX_POD_NAME=$(kubectl get pods -n gitlab -lapp=toolbox -o=jsonpath='{.items..metadata.name}')
 echo $TOOLBOX_POD_NAME
 #generate token
-TOKEN=$(head -n 10 /dev/random | sha256sum | tr -d '-')
-# TOKEN="toto"
-echo $TOKEN
+# TOKEN=$(head -n 10 /dev/random | sha256sum | tr -d '-')
+TOKEN="toto"
+echo "TOKEN gitlab: $TOKEN"
 
 # create pat
 kubectl exec -it $TOOLBOX_POD_NAME -n gitlab -- gitlab-rails runner -e production "\
@@ -19,7 +19,7 @@ echo "Created token"
 curl -k --request POST --header "PRIVATE-TOKEN: $TOKEN" \
      --header "Content-Type: application/json" --data '{
         "name": "iot_argocd", "description": "ArgoCD IoT", "path": "argocd",
-        "namespace_id": "1", "initialize_with_readme": "true"}' \
+        "namespace_id": "1", "initialize_with_readme": "true", "visibility": "public"}' \
      --url "https://gitlab.local/api/v4/projects/" | jq
 
 echo "Created repository"
@@ -28,11 +28,10 @@ echo "Created repository"
 # clone
 # git clone https://username:password@github.com/username/repository.git
 PROJECT_URI="https://root:$TOKEN@gitlab.local/root/argocd.git"
-GIT_SSL_NO_VERIFY=1 git clone $PROJECT_URI ~/proj || true
+GIT_SSL_NO_VERIFY=1 git clone $PROJECT_URI /home/vagrant/proj || true
 #add deploy.yml
-cp $PWD/confs/api/deployment.yml ~/proj/deployment.yml
-cd ~/proj
-# cp /vagrant/confs/api/deployment.yml .
+cp $PWD/confs/api/deployment.yml /home/vagrant/proj/deployment.yml
+cd /home/vagrant/proj
 git config --local user.name "root"
 git config --local user.email "root@local"
 git add .
