@@ -21,6 +21,7 @@ helm upgrade --install gitlab gitlab/gitlab \
   --set global.ingress.configureCertmanager=false \
   --set gitlab-runner.install=false
 
+echo "Wait for Gitlab to be ready"
 kubectl wait -n gitlab --for=condition=available deployment.apps/gitlab-webservice-default --timeout=300s
 
 export GITLAB_PASSWORD=$(kubectl -n gitlab get secret gitlab-gitlab-initial-root-password -ojsonpath='{.data.password}' | base64 --decode)

@@ -1,23 +1,38 @@
 #!/bin/sh
 
+cd /vagrant
 # locate the Toolbox pod
-TOOLBOX_POD_NAME = $(kubectl get pods -lapp=toolbox -o=jsonpath='{.items..metadata.name}')
-
+TOOLBOX_POD_NAME=$(kubectl get pods -n gitlab -lapp=toolbox -o=jsonpath='{.items..metadata.name}')
+echo $TOOLBOX_POD_NAME
 #generate token
-TOKEN = $(head -n 10 /dev/random | sha256sum | tr -d '-')
+TOKEN=$(head -n 10 /dev/random | sha256sum | tr -d '-')
+# TOKEN="toto"
+echo $TOKEN
 
-kubectl exec -it $TOOLBOX_POD_NAME -- gitlab-rails runner "\
-token = User.find_by_username('root').personal_access_tokens.create(scopes: ['api'], name: 'Automation token', expires_at: 365.days.from_now);\
-token.set_token($TOKEN); token.save!"
+kubectl exec -it $TOOLBOX_POD_NAME -n gitlab -- gitlab-rails runner -e production "\
+token = User.find_by_username('root').personal_access_tokens.create(scopes: ['api', 'read_repository', 'write_repository'], name: 'Automation token', expires_at: 365.days.from_now);\
+token.set_token(\"$TOKEN\"); token.save!"
 
-# create
-curl --request POST --header "PRIVATE-TOKEN: $TOKEN" \
+
+# create pat
+curl -k --request POST --header "PRIVATE-TOKEN: $TOKEN" \
      --header "Content-Type: application/json" --data '{
         "name": "iot_argocd", "description": "ArgoCD IoT", "path": "argocd",
-        "namespace_id": "42", "initialize_with_readme": "true"}' \
+        "namespace_id": "1", "initialize_with_readme": "true"}' \
      --url "https://gitlab.local/api/v4/projects/"
 
 
+# https://gitlab.local/root/argocd.git
 # clone
+# git clone https://username:password@github.com/username/repository.git
+PROJECT_URI="https://root:$TOKEN@gitlab.local/root/argocd.git"
+GIT_SSL_NO_VERIFY=1 git clone $PROJECT_URI ~/proj || true
 #add deploy.yml
-#commit+push
+cp $PWD/confs/api/deployment.yml ~/proj/deployment.yml
+cd ~/proj
+# cp /vagrant/confs/api/deployment.yml .
+git config --local user.name "root"
+git config --local user.email "root@local"
+git add .
+git commit -m 'add deployment'
+GIT_SSL_NO_VERIFY=1 git push
