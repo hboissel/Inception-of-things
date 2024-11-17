@@ -1,7 +1,7 @@
 #!/bin/sh
 
 sudo apt-get update -y
-sudo apt-get install -y curl net-tools
+sudo apt-get install -y curl net-tools jq
 
 if ! grep -q "127.0.0.1 argocd.local" /etc/hosts; then
     echo -e "127.0.0.1 argocd.local\n127.0.0.1 api.local\ngitlab.local" | sudo tee -a /etc/hosts
