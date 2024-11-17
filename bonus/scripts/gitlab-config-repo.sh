@@ -9,18 +9,20 @@ TOKEN=$(head -n 10 /dev/random | sha256sum | tr -d '-')
 # TOKEN="toto"
 echo $TOKEN
 
+# create pat
 kubectl exec -it $TOOLBOX_POD_NAME -n gitlab -- gitlab-rails runner -e production "\
 token = User.find_by_username('root').personal_access_tokens.create(scopes: ['api', 'read_repository', 'write_repository'], name: 'Automation token', expires_at: 365.days.from_now);\
 token.set_token(\"$TOKEN\"); token.save!"
 
+echo "Created token"
 
-# create pat
 curl -k --request POST --header "PRIVATE-TOKEN: $TOKEN" \
      --header "Content-Type: application/json" --data '{
         "name": "iot_argocd", "description": "ArgoCD IoT", "path": "argocd",
         "namespace_id": "1", "initialize_with_readme": "true"}' \
-     --url "https://gitlab.local/api/v4/projects/"
+     --url "https://gitlab.local/api/v4/projects/" | jq
 
+echo "Created repository"
 
 # https://gitlab.local/root/argocd.git
 # clone
