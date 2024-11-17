@@ -24,13 +24,11 @@ curl -k --request POST --header "PRIVATE-TOKEN: $TOKEN" \
 
 echo "Created repository"
 
-# https://gitlab.local/root/argocd.git
-# clone
-# git clone https://username:password@github.com/username/repository.git
+# clone the repository and add deployment.yml
 PROJECT_URI="https://root:$TOKEN@gitlab.local/root/argocd.git"
 GIT_SSL_NO_VERIFY=1 git clone $PROJECT_URI /home/vagrant/proj || true
-#add deploy.yml
-cp $PWD/confs/api/deployment.yml /home/vagrant/proj/deployment.yml
+
+cp /vagrant/confs/api/deployment.yml /home/vagrant/proj/deployment.yml
 cd /home/vagrant/proj
 git config --local user.name "root"
 git config --local user.email "root@local"

@@ -11,8 +11,8 @@ Vagrant.configure("2") do |config|
   config.vm.box_check_update = false
 
   config.vm.provider "virtualbox" do |vb|
-    vb.cpus = 12
-    vb.memory = "32000"
+    vb.cpus = 8
+    vb.memory = "10240"
   end
 
   config.vm.define SERVER_NAME do |machine|
@@ -24,5 +24,6 @@ Vagrant.configure("2") do |config|
     machine.vm.provision "shell", path: "scripts/init-server.sh"
     machine.vm.provision "shell", path: "scripts/k3d.sh", env: {SERVER_IP: SERVER_IP}
     machine.vm.provision "shell", path: "scripts/gitlab.sh", env: {SERVER_IP: SERVER_IP}
+    machine.vm.provision "shell", path: "scripts/gitlab-config-repo.sh", env: {SERVER_IP: SERVER_IP}
   end
 end
