@@ -1,7 +1,5 @@
 #!/bin/bash
 
-cd /vagrant
-
 k3d cluster delete -a
 
 echo "===== Executing part 1: Cluster creation ====="
@@ -18,15 +16,6 @@ kubectl apply -n argocd -k confs/argocd/kustom
 echo "Waiting for ArgoCD to be ready..."
 kubectl wait -n argocd --for=condition=available deployment/argocd-server --timeout=300s
 echo "Creating Ingress and Application for ArgoCD"
-kubectl apply -n argocd -f confs/argocd
-
-export ARGODC_PASSWORD=$(
-    kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
-    echo
-)
-
-# print credentials
-echo "ArgoCD admin password: $ARGODC_PASSWORD"
-unset ARGODC_PASSWORD
+kubectl apply -n argocd -f confs/argocd/ingress.yml
 
 kubectl get all -A

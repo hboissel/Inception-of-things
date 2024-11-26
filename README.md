@@ -30,3 +30,6 @@ TODO:
 - [x] Make cloning functionnal (https/ssh) -> export GIT_SSL_NO_VERIFY=1
 - [x] Create repo automatically + push deployment.yml
 - [x] Change argocd url
+
+## Ressources
+https://forum.gitlab.com/t/gitlab-on-kubernetes-behind-traefk-ingressroutes-external-cert-manager/98019/2
